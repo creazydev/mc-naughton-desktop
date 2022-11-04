@@ -101,7 +101,6 @@ class McNaughtonController {
     private void renderChart(McNaughtonResult result) {
         this.chart.getData().clear();
 
-        final NumberAxis xAxis = (NumberAxis) this.chart.getXAxis();
         final CategoryAxis yAxis = (CategoryAxis) this.chart.getYAxis();
 
         yAxis.setCategories(FXCollections.observableArrayList(
