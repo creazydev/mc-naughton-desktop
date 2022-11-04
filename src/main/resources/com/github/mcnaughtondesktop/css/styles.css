@@ -1,0 +1,16 @@
+.left-panel{
+    -fx-background-color: #a5aafa;
+}
+
+.info-panel{
+    -fx-background-color: #d7d7d7;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.button {
+    -fx-text-fill: white;
+    -fx-background-color: #2a00f7;
+}
