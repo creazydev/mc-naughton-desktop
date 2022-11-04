@@ -1,4 +1,4 @@
-package com.github.mcnaughtondesktop;
+package com.github.mcnaughtondesktop.model;
 
 import javafx.beans.NamedArg;
 import javafx.collections.FXCollections;
