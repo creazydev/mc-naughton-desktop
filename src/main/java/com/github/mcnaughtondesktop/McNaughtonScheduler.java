@@ -26,7 +26,7 @@ public class McNaughtonScheduler {
 
         for (int i = 0; i < machineCount; i++) {
             Machine machine = new Machine(currentId++);
-            int durationSum = 0;
+            double durationSum = 0.0;
 
             if (toAddToNext != null) {
                 machine.addTask(toAddToNext);
