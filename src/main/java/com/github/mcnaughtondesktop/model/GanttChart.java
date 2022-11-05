@@ -16,17 +16,17 @@ public class GanttChart<X, Y> extends XYChart<X, Y> {
 
     public static class ExtraData {
 
-        public long length;
+        public double length;
         public String bgColor;
 
 
-        public ExtraData(long lengthMs, String bgColor) {
+        public ExtraData(double lengthMs, String bgColor) {
             super();
             this.length = lengthMs;
             this.bgColor = bgColor;
         }
 
-        public long getLength() {
+        public double getLength() {
             return length;
         }
 

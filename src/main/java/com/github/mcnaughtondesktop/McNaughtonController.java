@@ -18,6 +18,7 @@ import javafx.scene.text.Text;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 class McNaughtonController {
@@ -129,20 +130,29 @@ class McNaughtonController {
             .stream()
             .collect(Collectors.toMap(v -> v, v -> this.getRandomColor()));
 
-        result.getMachines().stream().sequential().forEachOrdered(machine -> {
-            XYChart.Series<Number, String> series = new XYChart.Series<>();
+        List<List<XYChart.Data<Number, String>>> machines = result.getMachines().stream()
+            .map(machine -> {
+                AtomicReference<Double> counter = new AtomicReference<>(0.0);
 
-            series.getData().addAll(
-                machine.getTasks()
+                return machine.getTasks()
                     .stream().sequential()
-                    .map(task -> new XYChart.Data<Number, String>(
-                        0,
-                        machine.toString(),
-                        new GanttChart.ExtraData(task.getDuration(), tasksColors.get(task.getId())))
-                    )
-                    .collect(Collectors.toList())
-            );
+                    .map(task -> {
+                        XYChart.Data<Number, String> obj = new XYChart.Data<>(
+                            counter.get(),
+                            machine.toString(),
+                            new GanttChart.ExtraData(task.getDuration(), tasksColors.get(task.getId())));
 
+                        counter.getAndUpdate(val -> val + task.getDuration());
+                        return obj;
+                    })
+                    .collect(Collectors.toList());
+            })
+            .collect(Collectors.toList());
+
+
+        machines.stream().sequential().forEachOrdered(machineTasks -> {
+            XYChart.Series<Number, String> series = new XYChart.Series<>();
+            series.getData().addAll(machineTasks);
             this.chart.getData().add(series);
         });
     }
