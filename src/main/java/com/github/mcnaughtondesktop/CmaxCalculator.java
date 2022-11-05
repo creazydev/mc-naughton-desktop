@@ -3,6 +3,7 @@ package com.github.mcnaughtondesktop;
 import com.github.mcnaughtondesktop.model.Task;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CmaxCalculator {
     private static final String TEMPLATE = "Cmax = max{max{%s}, %s / %s}} = max{%s, %s} = %s";
@@ -23,7 +24,7 @@ public class CmaxCalculator {
         int averageDurationPerMachine = tasks.stream().mapToInt(Task::getDuration).sum() / machineCount;
         result = Integer.max(maxTaskDuration, averageDurationPerMachine);
 
-        String taskExecutionTimesString = tasks.stream().map(Task::getDuration).toList().toString();
+        String taskExecutionTimesString = tasks.stream().map(Task::getDuration).collect(Collectors.toList()).toString();
         String taskExecutionTimesStringTrimmed = taskExecutionTimesString.substring(1, taskExecutionTimesString.length() - 1);
         resultString = String.format(TEMPLATE, taskExecutionTimesStringTrimmed, taskExecutionTimesSum, machineCount, maxTaskDuration, averageDurationPerMachine, result);
     }

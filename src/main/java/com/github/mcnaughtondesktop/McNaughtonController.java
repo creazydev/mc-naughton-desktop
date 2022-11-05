@@ -16,11 +16,16 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 class McNaughtonController {
+    private final Random random = new Random();
+
     TextField taskQuantityField = new TextField();
     TextField machineQuantityField = new TextField();
 
@@ -95,11 +100,11 @@ class McNaughtonController {
     private List<Task> getTasks() {
         AtomicInteger lastId = new AtomicInteger(1);
         return this.taskInputsWrapper.getChildren()
-                .stream().sequential()
-                .filter(node -> node instanceof TextField)
-                .map(node -> (TextField) node)
-                .map(field -> new Task(lastId.getAndIncrement(), TextParser.toInt(field.getText()).orElseThrow()))
-                .collect(Collectors.toList());
+            .stream().sequential()
+            .filter(node -> node instanceof TextField)
+            .map(node -> (TextField) node)
+            .map(field -> new Task(lastId.getAndIncrement(), TextParser.toInt(field.getText()).orElseThrow()))
+            .collect(Collectors.toList());
     }
 
     private void renderChart(McNaughtonResult result) {
@@ -113,17 +118,34 @@ class McNaughtonController {
 
         this.chart.setTitle("Przydział zadań");
 
+        Map<Integer, String> tasksColors = result.getMachines().stream()
+            .map(Machine::getTasks)
+            .flatMap(Collection::parallelStream)
+            .map(Task::getId)
+            .collect(Collectors.toSet())
+            .stream()
+            .collect(Collectors.toMap(v -> v, v -> this.getRandomColor()));
+
         result.getMachines().stream().sequential().forEachOrdered(machine -> {
             XYChart.Series<Number, String> series = new XYChart.Series<>();
 
             series.getData().addAll(
                 machine.getTasks()
-                .stream().sequential()
-                .map(task -> new XYChart.Data<Number, String>(0, machine.toString(), new GanttChart.ExtraData(task.getDuration(), "status-red")))
-                .toList()
+                    .stream().sequential()
+                    .map(task -> new XYChart.Data<Number, String>(
+                        0,
+                        machine.toString(),
+                        new GanttChart.ExtraData(task.getDuration(), tasksColors.get(task.getId())))
+                    )
+                    .collect(Collectors.toList())
             );
 
             this.chart.getData().add(series);
         });
+    }
+
+    private String getRandomColor() {
+        int nextInt = random.nextInt(0xffffff + 1);
+        return String.format("#%06x", nextInt);
     }
 }
