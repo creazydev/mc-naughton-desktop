@@ -75,6 +75,11 @@
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
+                <configuration>
+                    <mainClass>com.github.mcnaughtondesktop/com.github.mcnaughtondesktop.McNaughtonDesktopApplication</mainClass>
+                    <launcher>mc-naughton</launcher>
+                    <compress>2</compress>
+                </configuration>
                 <executions>
                     <execution>
                         <!-- Default configuration for running with: mvn clean javafx:run -->
