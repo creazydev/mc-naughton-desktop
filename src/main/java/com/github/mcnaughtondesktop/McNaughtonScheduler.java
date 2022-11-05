@@ -20,11 +20,34 @@ public class McNaughtonScheduler {
     public List<Machine> schedule() {
         int currentId = 1;
         List<Machine> result = new ArrayList<>();
+        Task toAddToNext = null;
+
         for (int i = 0; i < machineCount; i++) {
             Machine machine = new Machine(currentId++);
+            int durationSum = 0;
 
+            if (toAddToNext != null) {
+                machine.addTask(toAddToNext);
+                durationSum += toAddToNext.getDuration();
+            };
+
+            Task nextTask = tasks.size() > 0 ? tasks.remove(0) : null;
+            while (nextTask != null) {
+                if (durationSum == cmax) {
+                    toAddToNext = nextTask;
+                    break;
+                }
+                if (durationSum + nextTask.getDuration() > cmax) {
+                    toAddToNext = nextTask.splitAt(cmax - durationSum);
+                    machine.addTask(nextTask);
+                    break;
+                }
+                machine.addTask(nextTask);
+                nextTask = tasks.size() > 0 ? tasks.remove(0) : null;
+            }
+            result.add(machine);
         }
-        // @TODO
-        return new ArrayList<>();
+
+        return result;
     }
 }
