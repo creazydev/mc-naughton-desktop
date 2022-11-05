@@ -164,7 +164,9 @@ public class GanttChart<X, Y> extends XYChart<X, Y> {
             item.setNode(container);
         }
 
-        container.setStyle("-fx-background-color: " + item.getExtraValue());
+        ExtraData extraData = (ExtraData) item.getExtraValue();
+
+        container.setStyle("-fx-background-color: " + extraData.getBgColor());
 
         return container;
     }

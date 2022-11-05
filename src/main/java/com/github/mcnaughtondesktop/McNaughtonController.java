@@ -16,10 +16,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -48,11 +45,17 @@ class McNaughtonController {
     private void setTextFieldTypeNumber(final TextField textField) {
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
-                textField.setText(newValue.replaceAll("[^\\d]", ""));
+                final String value = newValue.replaceAll("[^\\d]", "");
+
+                TextParser.toInt(value)
+                    .filter(v -> v > 0)
+                    .ifPresentOrElse(v -> textField.setText(value), () -> textField.setText("1"));
+            } else if (Objects.equals(newValue, "0")) {
+                textField.setText("1");
             }
         });
 
-        textField.setText("0");
+        textField.setText("1");
     }
 
     private void addListRenderingListener(final TextField textField) {
