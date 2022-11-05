@@ -3,6 +3,7 @@ package com.github.mcnaughtondesktop;
 import com.github.mcnaughtondesktop.model.GanttChart;
 import com.github.mcnaughtondesktop.model.Machine;
 import com.github.mcnaughtondesktop.model.McNaughtonResult;
+import com.github.mcnaughtondesktop.model.Task;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -13,11 +14,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 class McNaughtonController {
@@ -84,18 +84,22 @@ class McNaughtonController {
     }
 
     private void runAlgorithm() {
-        McNaughtonResult result = McNaughton.calculate(
-            TextParser.toIntOr(this.machineQuantityField, 0),
-            this.taskInputsWrapper.getChildren()
+        int machineCount = TextParser.toIntOr(this.machineQuantityField, 0);
+        List<Task> tasks = getTasks();
+        CmaxCalculator calculator = new CmaxCalculator(machineCount, tasks);
+        McNaughtonScheduler scheduler = new McNaughtonScheduler(calculator.getResult(), machineCount, tasks);
+        this.infoText.setText(calculator.getResultString());
+        this.renderChart(new McNaughtonResult(calculator.getResult(), scheduler.schedule()));
+    }
+
+    private List<Task> getTasks() {
+        AtomicInteger lastId = new AtomicInteger(1);
+        return this.taskInputsWrapper.getChildren()
                 .stream().sequential()
                 .filter(node -> node instanceof TextField)
                 .map(node -> (TextField) node)
-                .map(field -> TextParser.toIntOr(field, 0))
-                .collect(Collectors.toList())
-        );
-
-        this.infoText.setText(result.getCmaxPattern());
-        this.renderChart(result);
+                .map(field -> new Task(lastId.getAndIncrement(), TextParser.toInt(field.getText()).orElseThrow()))
+                .collect(Collectors.toList());
     }
 
     private void renderChart(McNaughtonResult result) {
@@ -116,7 +120,7 @@ class McNaughtonController {
                 machine.getTasks()
                 .stream().sequential()
                 .map(task -> new XYChart.Data<Number, String>(0, machine.toString(), new GanttChart.ExtraData(task.getDuration(), "status-red")))
-                .collect(Collectors.toList())
+                .toList()
             );
 
             this.chart.getData().add(series);
