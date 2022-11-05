@@ -43,6 +43,7 @@ public class McNaughtonScheduler {
                     break;
                 }
                 machine.addTask(nextTask);
+                durationSum += nextTask.getDuration();
                 nextTask = tasks.size() > 0 ? tasks.remove(0) : null;
             }
             result.add(machine);
