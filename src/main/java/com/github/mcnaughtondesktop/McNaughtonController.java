@@ -35,24 +35,32 @@ class McNaughtonController {
 
     GanttChart<Number, String> chart = new GanttChart<>(new NumberAxis(), new CategoryAxis());
 
+    ObservableList<String> labels = FXCollections.observableArrayList(new ArrayList<>());
     McNaughtonController() {
-        this.setTextFieldTypeNumber(this.taskQuantityField);
+        this.setTextFieldTypeNumber(this.taskQuantityField, 30);
         this.addListRenderingListener(this.taskQuantityField);
-        this.setTextFieldTypeNumber(this.machineQuantityField);
+        this.setTextFieldTypeNumber(this.machineQuantityField, 20);
 
         this.executeButton.setOnMouseClicked((event) -> this.runAlgorithm());
     }
 
-    private void setTextFieldTypeNumber(final TextField textField) {
+    private void setTextFieldTypeNumber(final TextField textField, int maxValue) {
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
                 final String value = newValue.replaceAll("[^\\d]", "");
 
                 TextParser.toInt(value)
                     .filter(v -> v > 0)
-                    .ifPresentOrElse(v -> textField.setText(value), () -> textField.setText("1"));
+                    .map(v -> v > maxValue ? maxValue : v)
+                    .map(Integer::toUnsignedString)
+                    .ifPresentOrElse(textField::setText, () -> textField.setText("1"));
             } else if (Objects.equals(newValue, "0")) {
                 textField.setText("1");
+            } else {
+                TextParser.toInt(newValue)
+                    .map(v -> v > maxValue ? maxValue : v)
+                    .map(Integer::toUnsignedString)
+                    .ifPresent(textField::setText);
             }
         });
 
@@ -78,7 +86,7 @@ class McNaughtonController {
                             inputs.add(label);
 
                             TextField field = new TextField();
-                            this.setTextFieldTypeNumber(field);
+                            this.setTextFieldTypeNumber(field, 1000);
                             inputs.add(field);
                         }
 
@@ -112,14 +120,11 @@ class McNaughtonController {
     }
 
     private void renderChart(McNaughtonResult result) {
+        final CategoryAxis yAxis = (CategoryAxis) this.chart.getYAxis();
+        this.labels.clear();
         this.chart.getData().clear();
 
-        final CategoryAxis yAxis = (CategoryAxis) this.chart.getYAxis();
-
-        yAxis.setCategories(FXCollections.observableArrayList(
-            result.getMachines().stream().map(Machine::toString).collect(Collectors.toList())
-        ));
-
+        this.labels.addAll(result.getMachines().stream().map(Machine::toString).collect(Collectors.toList()));
         this.chart.setTitle("Przydział zadań");
 
         Map<Integer, String> tasksColors = result.getMachines().stream()

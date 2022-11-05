@@ -13,6 +13,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class McNaughtonDesktopApplication extends Application {
@@ -78,7 +79,6 @@ public class McNaughtonDesktopApplication extends Application {
 
     public VBox getRightPanel() {
         VBox vBox = new VBox();
-        vBox.getStyleClass().add("right-panel");
         vBox.setPrefHeight(900);
         vBox.setPrefWidth(1200);
         vBox.setPadding(new Insets(20));
@@ -88,16 +88,20 @@ public class McNaughtonDesktopApplication extends Application {
         infoBox.setPadding(new Insets(50));
         infoBox.setPrefHeight(50);
 
-        infoBox.getChildren().add(this.controller.infoText);
+        Text infoText = this.controller.infoText;
+        infoText.setWrappingWidth(1000);
+        infoBox.getChildren().add(infoText);
         vBox.getChildren().add(infoBox);
 
         GanttChart<Number, String> ganttChart = this.controller.chart;
         ganttChart.setLegendVisible(false);
-        ganttChart.setBlockHeight(50);
+        ganttChart.setMinHeight(600);
+        ganttChart.setMinWidth(1100);
         ganttChart.getStylesheets().add(getClass().getResource("css/ganttchart.css").toExternalForm());
 
         final NumberAxis xAxis = (NumberAxis) ganttChart.getXAxis();
         final CategoryAxis yAxis = (CategoryAxis) ganttChart.getYAxis();
+        yAxis.setCategories(this.controller.labels);
 
         xAxis.setLabel("");
         xAxis.setTickLabelFill(Color.CHOCOLATE);
@@ -110,8 +114,10 @@ public class McNaughtonDesktopApplication extends Application {
 
         ScrollPane chartScrollPanel = new ScrollPane();
         chartScrollPanel.setPadding(new Insets(20, 0, 0, 0));
-        chartScrollPanel.setFitToWidth(Boolean.TRUE);
-        chartScrollPanel.setFitToHeight(Boolean.TRUE);
+        chartScrollPanel.setMinWidth(600);
+//        chartScrollPanel.setFitToWidth(Boolean.TRUE);
+        chartScrollPanel.setPrefHeight(700);
+//        chartScrollPanel.setFitToHeight(Boolean.TRUE);
         chartScrollPanel.setContent(ganttChart);
         vBox.getChildren().add(chartScrollPanel);
 
