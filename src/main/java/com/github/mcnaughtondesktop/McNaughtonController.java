@@ -37,7 +37,7 @@ class McNaughtonController {
 
     ObservableList<String> labels = FXCollections.observableArrayList(new ArrayList<>());
     McNaughtonController() {
-        this.setTextFieldTypeNumber(this.taskQuantityField, 30);
+        this.setTextFieldTypeNumber(this.taskQuantityField, 1000);
         this.addListRenderingListener(this.taskQuantityField);
         this.setTextFieldTypeNumber(this.machineQuantityField, 20);
 
@@ -86,7 +86,7 @@ class McNaughtonController {
                             inputs.add(label);
 
                             TextField field = new TextField();
-                            this.setTextFieldTypeNumber(field, 1000);
+                            this.setTextFieldTypeNumber(field, 1000000);
                             inputs.add(field);
                         }
 

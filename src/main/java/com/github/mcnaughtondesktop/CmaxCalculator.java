@@ -23,7 +23,7 @@ public class CmaxCalculator {
 
     private void calculate() {
         double taskExecutionTimesSum = tasks.stream().mapToDouble(Task::getDuration).sum();
-        double maxTaskDuration = tasks.stream().mapToDouble(Task::getDuration).reduce(Double::max).orElseThrow();
+        double maxTaskDuration = tasks.stream().mapToDouble(Task::getDuration).reduce(Double::max).orElse(0);
         double averageDurationPerMachine = tasks.stream().mapToDouble(Task::getDuration).sum() / machineCount;
         result = Double.max(maxTaskDuration, averageDurationPerMachine);
 
